@@ -94,7 +94,7 @@ class DingtalkAlert(AlertPlugin):
         #         "messageUrl": "https://open-doc.dingtalk.com/docs/doc.htm?spm=a219a.7629140.0.0.Rqyvqo&treeId=257&articleId=105735&docType=1"
         #     }
         # }
-        resp = requests.post(url, data=json.dumps({
+        ding_notification = {
             'msgtype': 'link',
             'link': {
                 'text': message,
@@ -102,8 +102,11 @@ class DingtalkAlert(AlertPlugin):
                 'picUrl': '',
                 'messageUrl': ''
             }
-        }))
-        logger.info('ding alert resp=%s' % resp)
+        }
+        logger.info('ding alert notification = %s' % ding_notification)
+        resp = requests.post(url, data=json.dumps(ding_notification))
+        logger.info('ding alert resp=%s.' % resp.text)
+        logger.info('ding alert resp=%s.' % resp)
 
 
 class DingtalkAlertUserData(AlertPluginUserData):
