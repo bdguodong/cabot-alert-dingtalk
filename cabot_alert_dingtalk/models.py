@@ -4,7 +4,7 @@ from cabot.cabotapp.alert import AlertPlugin, AlertPluginUserData
 from os import environ as env
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+# from django.core.urlresolvers import reverse
 from django.template import Context, Template
 
 import requests
@@ -13,26 +13,16 @@ import json
 from logging import getLogger
 logger = getLogger(__name__)
 
-dingtalk_template = """
+dingtalk_template = """\
 Service {{ service.name }} {% if service.overall_status == service.PASSING_STATUS %}*is back to normal*{% else %}reporting *{{ service.overall_status }}* status{% endif %}: {{ scheme }}://{{ host }}{% url 'service' pk=service.id %} \
 {% if alert %}{% for alias in users %} @{{ alias }}{% endfor %}{% endif %}\
 
 {% if service.overall_status != service.PASSING_STATUS %}Checks failing:\
 {% for check in service.all_failing_checks %}\
-    {% if check.check_category == 'Jenkins check' %}\
-        {% if check.last_result.error %}\
-            - {{ check.name }} ({{ check.last_result.error|safe }}) {{check.jenkins_config.jenkins_api}}job/{{ check.name }}/{{ check.last_result.job_number }}/console
-        {% else %}\
-            - {{ check.name }} {{check.jenkins_config.jenkins_api}}/job/{{ check.name }}/{{check.last_result.job_number}}/console
-        {% endif %}\
-    {% else %}
-        - {{ check.name }} {% if check.last_result.error %} ({{ check.last_result.error|safe }}){% endif %}
-    {% endif %}\
+    - {{ check.name }} {% if check.last_result.error %} ({{ check.last_result.error|safe }}){% endif %}\
 {% endfor %}\
 {% endif %}\
 """
-
-# This provides the slack alias for each user. Each object corresponds to a User
 
 
 class DingtalkAlert(AlertPlugin):
@@ -71,29 +61,9 @@ class DingtalkAlert(AlertPlugin):
     def _send_dingtalk_alert(self, message, service, color='good', sender='Cabot'):
         url = env.get('DINGTALK_WEBHOOK_URL')
         if not url:
-            logger.info('invalid dingtalk webhook url')
-
-        actions = []
-        if service.overall_status != service.PASSING_STATUS:
-            actions.append({
-                "name": "acknowledge",
-                "text": "Acknowledge",
-                "type": "button",
-                "value": "acknowledge",
-            })
-
+            logger.error('invalid dingtalk webhook url')
         # TODO: handle color
-        # text
-        #     "msgtype": "text",
-        #     "text": {
-        #         "content": "我就是我,  @1825718XXXX 是不一样的烟火"
-        #     },
-        #     "at": {
-        #         "atMobiles": [
-        #             "1825718XXXX"
-        #         ],
-        #         "isAtAll": false
-        #     }
+        # text temp
         ding_notification = {
             'msgtype': 'text',
             'text': {
