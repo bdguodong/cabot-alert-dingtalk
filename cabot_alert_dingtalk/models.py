@@ -103,8 +103,9 @@ class DingtalkAlert(AlertPlugin):
                 'messageUrl': ''
             }
         }
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
         logger.info('ding alert notification = %s' % ding_notification)
-        resp = requests.post(url, data=json.dumps(ding_notification))
+        resp = requests.post(url, headers=headers, data=json.dumps(ding_notification))
         logger.info('ding alert resp=%s.' % resp.text)
         logger.info('ding alert resp=%s.' % resp)
 
