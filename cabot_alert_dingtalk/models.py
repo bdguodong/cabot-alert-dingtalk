@@ -13,14 +13,17 @@ import json
 from logging import getLogger
 logger = getLogger(__name__)
 
+# link url:
+# {{ scheme }}://{{ host }}{% url 'service' pk=service.id %}
+# title = ''
+# {% if service.overall_status == service.PASSING_STATUS %} [OK] {% else %} [Alerting] {% endif %} {{ service.name }}\
 dingtalk_template = """\
-Service {{ service.name }} {% if service.overall_status == service.PASSING_STATUS %}*is back to normal*{% else %}reporting *{{ service.overall_status }}* status{% endif %}: {{ scheme }}://{{ host }}{% url 'service' pk=service.id %} \
-{% if alert %}{% for alias in users %} @{{ alias }}{% endfor %}{% endif %}\
-
 {% if service.overall_status != service.PASSING_STATUS %}Checks failing:\
 {% for check in service.all_failing_checks %}\
     - {{ check.name }} {% if check.last_result.error %} ({{ check.last_result.error|safe }}){% endif %}\
 {% endfor %}\
+{% else %}
+    - Service Checks Passing.\
 {% endif %}\
 """
 
@@ -62,12 +65,15 @@ class DingtalkAlert(AlertPlugin):
         url = env.get('DINGTALK_WEBHOOK_URL')
         if not url:
             logger.error('invalid dingtalk webhook url')
+        title = '[OK]' if service.overall_status == service.PASSING_STATUS else '[Alerting]' + ' ' + service.name
         # TODO: handle color
-        # text temp
+        # message type: link
         ding_notification = {
-            'msgtype': 'text',
-            'text': {
-                'content': message,
+            'msgtype': 'link',
+            'link': {
+                'title': title,
+                'text': message,
+                'messageUrl': settings.WWW_SCHEME + '//' + settings.WWW_HTTP_HOST + '/service/' + service.id + '/'
             }
         }
         headers = {'Content-Type': 'application/json; charset=utf-8'}
