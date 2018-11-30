@@ -73,7 +73,7 @@ class DingtalkAlert(AlertPlugin):
             'link': {
                 'title': title,
                 'text': message,
-                'messageUrl': settings.WWW_SCHEME + '//' + settings.WWW_HTTP_HOST + '/service/' + service.id + '/'
+                'messageUrl': settings.WWW_SCHEME + '//' + settings.WWW_HTTP_HOST + '/service/' + str(service.id) + '/'
             }
         }
         headers = {'Content-Type': 'application/json; charset=utf-8'}
