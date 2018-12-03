@@ -65,7 +65,7 @@ class DingtalkAlert(AlertPlugin):
         url = env.get('DINGTALK_WEBHOOK_URL')
         if not url:
             logger.error('invalid dingtalk webhook url')
-        title = '[OK]' if service.overall_status == service.PASSING_STATUS else '[Alerting]' + ' ' + service.name
+        title = ('[OK]' if service.overall_status == service.PASSING_STATUS else '[Alerting]') + ' ' + service.name
         # TODO: handle color
         # message type: link
         ding_notification = {
